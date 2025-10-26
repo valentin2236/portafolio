@@ -75,7 +75,6 @@ function SubCube({
     [metal]
   );
 
-  // geometría
   const size = 0.9;
   const geo = useMemo(() => new THREE.BoxGeometry(size, size, size), []);
   const edgeGeo = useMemo(() => new THREE.EdgesGeometry(geo), [geo]);
@@ -85,7 +84,7 @@ function SubCube({
         color: new THREE.Color(edge),
         transparent: true,
         opacity: 0.85,
-        linewidth: 1, // (algunos navegadores lo ignoran, igualmente luce bien)
+        linewidth: 1,
       }),
     [edge]
   );
@@ -99,21 +98,17 @@ function SubCube({
 }
 
 /* ============== cubo rubik con giros por capa y easing ============== */
-// --- arriba del archivo, junto a tus helpers ---
-const GAP = 0.06;           // mismo gap que usás para crear la grilla
-const STEP = 1 + GAP;       // distancia entre centros (-STEP, 0, +STEP)
+const GAP = 0.06;
+const STEP = 1 + GAP;
 
 function snapStep(v: number) {
-  // encastra al múltiplo de STEP más cercano: -STEP, 0, +STEP
   return Math.round(v / STEP) * STEP;
 }
 function snapAngle(rad: number) {
-  // encastra al múltiplo de 90°
   const q = Math.PI / 2;
   return Math.round(rad / q) * q;
 }
 
-// --- reemplazá COMPLETA tu función RubikCube por esta ---
 function RubikCube({
   hover,
   edge,
@@ -138,19 +133,16 @@ function RubikCube({
   useFrame((_, dt) => {
     if (!group.current) return;
 
-    // rotación base global
     group.current.rotation.y += dt * 0.18;
     group.current.rotation.x += dt * 0.08;
 
     clock.current += dt;
 
-    // lanzar un nuevo giro si no hay uno en curso
     if (!rotatingRef.current && clock.current > 2.2) {
       clock.current = 0;
       rotatingRef.current = true;
       tRef.current = 0;
 
-      // elegir eje y capa
       const axes: Array<"x" | "y" | "z"> = ["x", "y", "z"];
       const ax = axes[Math.floor(Math.random() * 3)];
       axisNameRef.current = ax;
@@ -161,57 +153,43 @@ function RubikCube({
 
       layerIndexRef.current = [-1, 0, 1][Math.floor(Math.random() * 3)];
 
-      // agrupar subcubos de esa capa **preservando mundo** con attach()
       const lg = new THREE.Group();
       lg.position.set(0, 0, 0);
       lg.rotation.set(0, 0, 0);
       lg.updateMatrixWorld(true);
 
       group.current.add(lg);
-      // importante: seleccioná por grilla usando STEP
       group.current.children
         .filter((child) => child !== lg)
         .forEach((child: any) => {
           const posOnAxis = child.position[ax];
           if (Math.round(posOnAxis / STEP) === layerIndexRef.current) {
-            // mover child a la capa conservando transformaciones
             lg.attach(child);
           }
         });
 
       layerGroupRef.current = lg;
-      // cuarto de giro 90° en sentido aleatorio
       targetAngleRef.current = (Math.PI / 2) * (Math.random() > 0.5 ? 1 : -1);
     }
 
-    // animar capa activa con easing
     if (rotatingRef.current && layerGroupRef.current) {
       const speed = 1.15;
       tRef.current += dt * (1 / speed);
-      // easing compuesto (suave + “click” final)
       const t = Math.min(tRef.current, 1);
-      const eased = (() => {
-        const e1 = t < 0.5 ? 4*t*t*t : 1 - Math.pow(-2*t + 2, 3)/2; // easeInOutCubic
-        // pequeño back para sensación mecánica
-        const s = 0.85, c1 = s, c3 = c1 + 1;
-        const back = 1 + c3*Math.pow(e1 - 1, 3) + c1*Math.pow(e1 - 1, 2);
-        return back;
-      })();
 
-      // reset y aplicar rotación actual
+      const e1 = easeInOutCubic(t);
+      const back = easeOutBack(e1, 0.85);
+
       layerGroupRef.current.rotation.set(0, 0, 0);
-      layerGroupRef.current.rotateOnAxis(axisRef.current, targetAngleRef.current * eased);
+      layerGroupRef.current.rotateOnAxis(axisRef.current, targetAngleRef.current * back);
 
       if (tRef.current >= 1) {
-        // fijar ángulo exacto
         layerGroupRef.current.rotation.set(0, 0, 0);
         layerGroupRef.current.rotateOnAxis(axisRef.current, targetAngleRef.current);
 
-        // devolver subcubos al grupo principal **preservando mundo** con attach()
         const children = [...layerGroupRef.current.children];
         children.forEach((c) => {
           group.current!.attach(c);
-          // snap a grilla y rotaciones 90°
           c.position.set(
             snapStep(c.position.x),
             snapStep(c.position.y),
@@ -224,7 +202,6 @@ function RubikCube({
           );
         });
 
-        // remover grupo de capa
         group.current.remove(layerGroupRef.current);
         layerGroupRef.current = null;
         rotatingRef.current = false;
@@ -240,7 +217,6 @@ function RubikCube({
     </group>
   );
 }
-
 
 /* ============== partículas verdes sutiles alrededor ============== */
 function FloatingParticles({ count = 220, color = "#39FF14" }) {
@@ -268,11 +244,10 @@ function FloatingParticles({ count = 220, color = "#39FF14" }) {
   return (
     <points ref={points}>
       <bufferGeometry>
+        {/* 🔧 cambio clave: usar args={[array, itemSize]} */}
         <bufferAttribute
           attach="attributes-position"
-          count={positions.length / 3}
-          array={positions}
-          itemSize={3}
+          args={[positions, 3]}
         />
       </bufferGeometry>
       <pointsMaterial size={0.03} color={color} transparent opacity={0.55} sizeAttenuation />
@@ -283,8 +258,8 @@ function FloatingParticles({ count = 220, color = "#39FF14" }) {
 /* ============== componente principal ============== */
 export function Hero3D() {
   const [hover, setHover] = useState(false);
-  const primary = usePrimaryColor("#39FF14"); // mismo verde que tus textos
-  const metal = "#1a1a1a";                    // gris metálico oscuro
+  const primary = usePrimaryColor("#39FF14");
+  const metal = "#1a1a1a";
 
   return (
     <section className="grid lg:grid-cols-2 gap-10 items-center pt-5">
@@ -296,7 +271,7 @@ export function Hero3D() {
           Diseño paginas web <span className="text-primary">Modernas y escalables</span>
         </h1>
         <p className="text-slate-400 max-w-xl">
-         Transformo ideas en soluciones digitales funcionales y atractivas
+          Transformo ideas en soluciones digitales funcionales y atractivas
         </p>
         <div className="flex gap-3 pt-3">
           <a href="/proyectos" className="border border-primary/50 px-5 py-3 rounded-xl hover:border-primary transition">
@@ -318,7 +293,7 @@ export function Hero3D() {
           <color attach="background" args={["#000000"]} />
           <PerspectiveCamera makeDefault position={[0, 0, 8]} fov={45} />
 
-          {/* Luces (verde del sitio para reflejos y bordes) */}
+          {/* Luces */}
           <ambientLight intensity={0.35} />
           <pointLight position={[4, 4, 4]} intensity={2} color={primary} />
           <pointLight position={[-4, -4, -4]} intensity={1.2} color={primary} />
