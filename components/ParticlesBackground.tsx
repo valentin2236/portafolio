@@ -32,7 +32,10 @@ export function ParticlesBackground() {
     fpsLimit: 60,
     detectRetina: true,
     particles: {
-      number: { value: 40, density: { enable: true, area: 800 } },
+      number: {
+        value: 40,
+        density: { enable: true }, // ← quitar "area"
+      },
       color: { value: "#00ff99" },
       links: { enable: true, color: "#00ff99", opacity: 0.15, distance: 120 },
       move: { enable: true, speed: 0.6, outModes: "out" },
