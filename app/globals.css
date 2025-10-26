@@ -1,0 +1,22 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+html { scroll-behavior: smooth; }
+
+body {
+  @apply bg-black text-slate-100 antialiased;
+  background: radial-gradient(1200px 600px at 80% -10%, rgba(57,255,20,.08), transparent 40%),
+              radial-gradient(1000px 500px at -10% 10%, rgba(57,255,20,.06), transparent 35%),
+              #0b0b0b;
+}
+
+/* utilidades */
+.container-p { @apply max-w-6xl mx-auto px-4; }
+.section-title { @apply text-3xl md:text-4xl font-semibold tracking-tight; }
+
+
+/* Transición suave al cambiar de tema */
+* {
+  transition: background-color .2s ease, border-color .2s ease, color .2s ease;
+}
