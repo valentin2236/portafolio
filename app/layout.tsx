@@ -9,6 +9,9 @@ import { ParticlesBackground } from "@/components/ParticlesBackground";
 export const metadata = {
   title: "Valentín Arriola — Portafolio",
   description: "Portafolio profesional con Next.js + Tailwind y animaciones 3D.",
+  icons: {
+    icon: "/favicon.png", // 👈 tu logo aquí
+  }
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
