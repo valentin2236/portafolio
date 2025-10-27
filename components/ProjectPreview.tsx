@@ -66,6 +66,22 @@ export function ProjectPreview({ projects }: { projects: Project[] }) {
                 </Link>
               )}
             </div>
+            {/* 👇 Nuevo botón “Ver todos los proyectos” */}
+        <div className="text-center">
+          <motion.div
+            initial={{ opacity: 0, y: 10 }}
+            whileInView={{ opacity: 1, y: 0 }}
+            viewport={{ once: true }}
+            transition={{ duration: 0.6 }}
+          >
+            <Link
+              href="/proyectos"
+              className="inline-flex items-center gap-2 border border-primary/60 text-primary px-6 py-3 rounded-xl hover:bg-primary hover:text-black transition font-medium"
+            >
+              Ver todos los proyectos
+            </Link>
+          </motion.div>
+        </div>
 
             <motion.div
               className="absolute inset-0 border-2 border-primary/60 rounded-2xl opacity-0 group-hover:opacity-100 blur-[2px] pointer-events-none"

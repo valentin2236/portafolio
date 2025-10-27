@@ -39,6 +39,7 @@ export const projects: Project[] = [
   year: "2024",
   stack: ["HTML", "CSS",],
   image: "/proyectos/portafoliobasic.png",
+  url: "https://portafolio-arriola-valentin.netlify.app/"
 },
 {
   slug: "instituto-tesla",
