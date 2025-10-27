@@ -20,8 +20,22 @@ export function ProjectPreview({ projects }: { projects: Project[] }) {
   const featured = projects.slice(0, 2);
 
   return (
-    <section className="space-y-6">
-      <h2 className="text-2xl md:text-3xl font-semibold">Proyectos destacados</h2>
+    <section className="space-y-8">
+      {/* Encabezado con botón "Ver todos" */}
+      <div className="flex items-center justify-between">
+        <h2 className="text-2xl md:text-3xl font-semibold">
+          Proyectos destacados
+        </h2>
+
+        <Link
+          href="/proyectos"
+          className="text-sm md:text-base border border-primary/50 px-4 py-2 rounded-xl hover:border-primary hover:bg-primary/10 transition font-medium text-primary"
+        >
+          Ver todos los proyectos
+        </Link>
+      </div>
+
+      {/* Grilla de proyectos */}
       <div className="grid md:grid-cols-2 gap-6">
         {featured.map((p, i) => (
           <motion.div
@@ -45,7 +59,9 @@ export function ProjectPreview({ projects }: { projects: Project[] }) {
             <div className="p-4 flex items-end justify-between gap-4">
               <div>
                 <h3 className="text-lg font-semibold">{p.title}</h3>
-                <p className="text-sm text-slate-400 line-clamp-2">{p.description}</p>
+                <p className="text-sm text-slate-400 line-clamp-2">
+                  {p.description}
+                </p>
               </div>
 
               {p.url ? (
@@ -66,22 +82,6 @@ export function ProjectPreview({ projects }: { projects: Project[] }) {
                 </Link>
               )}
             </div>
-            {/* 👇 Nuevo botón “Ver todos los proyectos” */}
-        <div className="text-center">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6 }}
-          >
-            <Link
-              href="/proyectos"
-              className="inline-flex items-center gap-2 border border-primary/60 text-primary px-6 py-3 rounded-xl hover:bg-primary hover:text-black transition font-medium"
-            >
-              Ver todos los proyectos
-            </Link>
-          </motion.div>
-        </div>
 
             <motion.div
               className="absolute inset-0 border-2 border-primary/60 rounded-2xl opacity-0 group-hover:opacity-100 blur-[2px] pointer-events-none"
