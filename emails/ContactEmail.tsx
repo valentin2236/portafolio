@@ -2,18 +2,19 @@
 import * as React from "react";
 import {
   Html, Head, Preview, Body, Container, Heading, Text,
-  Section, Hr, Link, Tailwind
+  Section, Hr, Link, Tailwind,
 } from "@react-email/components";
 
 type Props = { name: string; email: string; message: string; siteUrl?: string };
 
 export default function ContactEmail({ name, email, message, siteUrl }: Props) {
   const preview = `Nuevo contacto de ${name}`;
+  const safeSite = siteUrl || "";
+
   return (
     <Html>
       <Head />
       <Preview>{preview}</Preview>
-      {/* Tailwind funciona dentro del wrapper <Tailwind> */}
       <Tailwind>
         <Body className="bg-[#0a0a0a] text-white">
           <Container className="mx-auto my-10 w-[600px] rounded-2xl border border-[#1b1b1b] bg-[#0f0f0f] p-8">
@@ -43,9 +44,9 @@ export default function ContactEmail({ name, email, message, siteUrl }: Props) {
               </Text>
             </Section>
 
-            {siteUrl && (
+            {safeSite && (
               <Text className="mt-6 text-center text-[13px] text-slate-500">
-                Enviado desde <Link href={siteUrl} className="text-[#39FF14]">tu portafolio</Link>
+                Enviado desde <Link href={safeSite} className="text-[#39FF14]">tu portafolio</Link>
               </Text>
             )}
           </Container>
